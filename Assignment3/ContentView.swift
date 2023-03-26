@@ -8,14 +8,34 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var viewModel = NameViewModel()
+    @State private var showingAddNameView = false
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+        NavigationView {
+            List {
+                ForEach(viewModel.names) { name in
+                    NavigationLink(destination: NameAgeView(viewModel: NameViewModel(), name: name.name)) {
+                        Text(name.name)
+                    }
+                }
+                .onDelete(perform: viewModel.removeName)
+            }
+            .navigationTitle("Agify Name API")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showingAddNameView = true
+                    }) {
+                        Label("Add Name", systemImage: "plus")
+                    }
+                }
+            }
+            .sheet(isPresented: $showingAddNameView) {
+                AddNameView(viewModel: viewModel)
+            }
         }
-        .padding()
+        .background(Color(red: 1.0, green: 0.9, blue: 0.8).ignoresSafeArea())
     }
 }
 
